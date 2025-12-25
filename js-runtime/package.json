@@ -1,0 +1,12 @@
+{
+  "name": "js-runtime-examples",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch:subs": "bun run bun_youtube_subtitle_example.ts"
+  },
+  "dependencies": {
+    "youtube-transcript": "^1.0.6"
+  }
+}
