@@ -27,3 +27,23 @@
 2. **MicroQuickJS**：
    - 更适合作为嵌入式交叉编译目标。在容器中可编译 `mqjs` 可执行文件做模拟测试，但实际部署仍需在目标固件中嵌入并暴露所需外设 API。
    - 运行 Claude 生成的脚本前需确保代码符合 ES5 子集并不依赖宿主 FS/网络；必要时通过 C API 手工桥接。
+
+## Bun 运行时示例：拉取 YouTube 字幕并与外部交互
+本仓库下的 `bun_youtube_subtitle_example.ts` 使用 [youtube-transcript](https://www.npmjs.com/package/youtube-transcript) 包，演示如何在 Bun 下：
+- 解析传入的 YouTube 链接/视频 ID；
+- 拉取指定语言（默认 `en`，可通过环境变量 `TRANSCRIPT_LANG` 配置）的字幕；
+- 将字幕拼接后输出，并可选地将结果 POST 到外部 webhook（示例中的 `--webhook=http://localhost:3000/subs`）。
+
+运行步骤（容器内需已安装 Bun，可用官方镜像 `oven/bun`）：
+```bash
+cd js-runtime
+# 安装依赖
+bun install
+
+# 运行示例，替换为你的链接；可选传入 --webhook 用于向外部系统交互
+bun run bun_youtube_subtitle_example.ts "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --webhook=http://localhost:3000/subs
+```
+
+脚本行为：
+- 成功时在终端打印字幕摘要与文本；若提供 `--webhook`，会以 JSON 发送 `{ videoId, lang, transcript, lineCount }`。
+- 失败时返回非 0 状态并打印错误，便于在 CI/容器管道中处理。
