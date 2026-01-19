@@ -5,4 +5,5 @@ servers/
 node-code-sandbox-mcp/
 codeexecutor/
 Agent Research/repos/
+coding_agent/repos/
 js-runtime/node_modules/
