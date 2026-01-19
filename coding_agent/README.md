@@ -1,211 +1,130 @@
-# Coding Agent 调研目录与结论草案
+# Coding Agent 调研（可联网版）
 
-> 说明：已在当前环境联网拉取 GitHub 仓库到本地 `coding_agent/repos/`，后续调研将基于本地 README 与文档进行整理。
+本目录用于公司内部科普与横向对比。已在当前环境拉取目标仓库源码，下面基于各项目 README/文档梳理其**定位、设计思路、使用方式、配置方法**与**集成方式（含自部署模型/第三方 API）**。
 
-## 目录结构
+## 仓库位置
 
-```
-coding_agent/
-  README.md               # 本文档：调研目录与结论草案
-  repos/                  # 已克隆的代码库位置
-```
+| 项目 | 仓库地址 | 本地路径 |
+| --- | --- | --- |
+| Claude Code | https://github.com/anthropics/claude-code | `coding_agent/repos/claude-code` |
+| Codex | https://github.com/openai/codex | `coding_agent/repos/codex` |
+| Pi Mono (coding-agent) | https://github.com/badlogic/pi-mono | `coding_agent/repos/pi-mono` |
+| OpenCode | https://github.com/opencode-ai/opencode | `coding_agent/repos/opencode` |
+| Kimi CLI | https://github.com/MoonshotAI/kimi-cli | `coding_agent/repos/kimi-cli` |
 
-## 主题清单（面向公司内部科普）
+## 1) Claude Code
 
-1. **Coding Agent 的定义与核心能力**
-   - 代码生成、修复、测试、重构、代码搜索、项目理解、变更摘要
-2. **典型产品与生态对比**
-   - Claude Code、Codex、Pi Mono（coding-agent）、OpenCode、Kimi CLI
-3. **架构与设计思路**
-   - 工具调用（Tools）/ 代理循环（Agent Loop）
-   - 本地环境执行与沙箱隔离
-   - 记忆机制与上下文压缩
-4. **使用方式与交互形态**
-   - CLI 模式、IDE 插件、Web/桌面应用
-5. **配置方式与可扩展性**
-   - 模型选择、提示词模板、工具权限控制
-6. **部署与集成**
-   - 自部署模型接入
-   - 第三方 API（OpenAI/Anthropic/Moonshot 等）接入
-7. **优势/不足与适用场景**
-   - 研发效率、学习曲线、稳定性与安全性
-8. **企业落地与治理**
-   - 访问控制、审计、合规、数据安全
+**定位/设计思路**
+- 终端内的代理式编码工具，支持自然语言执行代码理解、常规任务与 Git 工作流，并可在 IDE 或 GitHub 中 @claude 使用。【F:coding_agent/repos/claude-code/README.md†L1-L11】
+- 通过插件系统扩展能力，插件包含命令、Agent、Hooks 与 MCP 服务器集成（.mcp.json）等结构化扩展点。【F:coding_agent/repos/claude-code/plugins/README.md†L1-L74】
 
-## 仓库清单（已克隆）
+**使用方式**
+- 推荐安装方式：macOS/Linux 通过安装脚本或 Homebrew，Windows 通过 PowerShell 脚本或 Winget；安装后在项目目录运行 `claude`。【F:coding_agent/repos/claude-code/README.md†L13-L40】
 
-| 主题 | 目标仓库 | 说明 | 本地路径 |
-| --- | --- | --- | --- |
-| Claude Code | https://github.com/anthropics/claude-code | 官方 CLI 工具 | `coding_agent/repos/claude-code` |
-| Codex | https://github.com/openai/codex | OpenAI 的 Codex CLI/SDK | `coding_agent/repos/codex` |
-| Pi Mono (coding-agent) | https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent | 轻量化 agent 组件 | `coding_agent/repos/pi-mono` |
-| OpenCode | https://github.com/opencode-ai/opencode | 开源代码助理 | `coding_agent/repos/opencode` |
-| Kimi CLI | https://github.com/MoonshotAI/kimi-cli | Moonshot 的 CLI 工具 | `coding_agent/repos/kimi-cli` |
+**配置与扩展**
+- 插件可通过 `/plugin` 安装，项目级配置在 `.claude/settings.json` 中管理。【F:coding_agent/repos/claude-code/plugins/README.md†L40-L52】
+- 插件结构支持 MCP 服务器配置文件 `.mcp.json`，用于外部工具连接。【F:coding_agent/repos/claude-code/plugins/README.md†L54-L74】
 
-> 已完成克隆，后续建议：对 README、docs、示例配置与源码逐仓库解读并补齐结论表。
+**集成方式（自部署/三方 API）**
+- README 本身未包含自部署模型或多供应商接入配置；当前以官方文档为准，需要进一步在官方文档确认模型接入方式与企业网关策略。【F:coding_agent/repos/claude-code/README.md†L1-L46】
 
-## 联网验证结果（成功）
+**优势/不足（基于公开说明）**
+- 优势：插件生态与工作流（命令/Agent/Hooks/MCP）清晰，适合企业规范化扩展。【F:coding_agent/repos/claude-code/plugins/README.md†L1-L74】
+- 不足：仓库内未直接提供多供应商或自部署模型配置说明，需依赖官方文档进一步验证。【F:coding_agent/repos/claude-code/README.md†L1-L46】
 
-- `git clone --depth 1 https://github.com/anthropics/claude-code.git`
-- `git clone --depth 1 https://github.com/openai/codex.git`
-- `git clone --depth 1 https://github.com/badlogic/pi-mono.git`
-- `git clone --depth 1 https://github.com/opencode-ai/opencode.git`
-- `git clone --depth 1 https://github.com/MoonshotAI/kimi-cli.git`
+## 2) Codex (OpenAI)
 
-## 调研要点与输出模版
+**定位/设计思路**
+- OpenAI 出品的本地 CLI coding agent，可在终端运行，且支持 IDE 集成版本和云端 Codex Web。【F:coding_agent/repos/codex/README.md†L1-L13】
 
-> 以下为“待源码验证”的调研模板，可直接用于后续补全细节。
+**使用方式**
+- 安装：`npm install -g @openai/codex` 或 Homebrew 安装；安装后运行 `codex`。【F:coding_agent/repos/codex/README.md†L18-L33】
+- 认证：可选择 ChatGPT 账号登录或 API Key 方式（详见官方文档）。【F:coding_agent/repos/codex/README.md†L35-L42】
 
-### 1) Claude Code
-- **定位与优势**
-  - 与 Claude 模型生态深度绑定，强调高质量代码理解与多轮协作
-- **可能的设计思路**
-  - 强工具化：文件读写、命令执行、变更总结
-  - 追求稳健的变更控制与可解释性输出
-- **使用方式**
-  - CLI 交互、任务驱动式对话
-- **配置与集成**
-  - API Key、组织/项目范围配置
-  - 支持与 Anthropic API 对接
-- **可能的不足**
-  - 对生态外模型支持较弱
+**配置与扩展**
+- 配置文件位于 `~/.codex/config.toml`，可配置 MCP 服务器等扩展能力，具体字段详见官方配置参考文档。【F:coding_agent/repos/codex/docs/config.md†L1-L13】
+- Codex 支持“通知钩子（Notify）”等终端通知配置选项（同样在官方配置参考中）。【F:coding_agent/repos/codex/docs/config.md†L14-L22】
 
-### 2) Codex
-- **定位与优势**
-  - OpenAI 生态代码能力、配套 CLI/SDK
-- **设计思路**
-  - 强调“IDE 外”的自动化开发体验
-  - 可能具备审计日志、指令链等工程化特性
-- **使用方式**
-  - CLI + 任务式工作流
-- **配置与集成**
-  - OpenAI API Key、模型版本选择
-  - 可与自建代理层结合
-- **可能的不足**
-  - 对企业内网或自部署模型需要额外适配
+**集成方式（自部署/三方 API）**
+- 仓库文档未提供自部署模型接入说明；API Key 接入需参考官方认证文档。【F:coding_agent/repos/codex/README.md†L35-L42】【F:coding_agent/repos/codex/docs/authentication.md†L1-L3】
 
-### 3) Pi Mono (coding-agent)
-- **定位与优势**
-  - 轻量组件化，适合二次开发或嵌入业务系统
-- **设计思路**
-  - 模块化：模型、工具、执行器可替换
-- **使用方式**
-  - 作为 SDK/包集成在业务中
-- **配置与集成**
-  - 指定模型与工具接口
-  - 可能对自部署模型更友好
+**优势/不足（基于公开说明）**
+- 优势：CLI/IDE/Web 形态齐全，官方文档体系完善。【F:coding_agent/repos/codex/README.md†L1-L46】
+- 不足：多供应商或自部署模型配置未在仓库内直接给出，需依赖官方文档进一步验证。【F:coding_agent/repos/codex/docs/config.md†L1-L22】
 
-### 4) OpenCode
-- **定位与优势**
-  - 开源协作，支持社区扩展
-- **设计思路**
-  - 注重可配置性与透明度
-- **使用方式**
-  - CLI/本地运行
-- **配置与集成**
-  - 环境变量 + 配置文件
-  - 可插拔模型供应商
-- **可能的不足**
-  - 相对商业产品，易受社区维护节奏影响
+## 3) Pi Mono (coding-agent)
 
-### 5) Kimi CLI
-- **定位与优势**
-  - Moonshot 生态 CLI 工具，中文体验较强
-- **设计思路**
-  - 面向多轮对话与命令式交互
-- **使用方式**
-  - CLI
-- **配置与集成**
-  - Kimi API Key
-  - 可能支持本地/自建代理网关
+**定位/设计思路**
+- 终端型 coding agent，支持多模型与会话中切换模型，强调“轻量、可组合”。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L1-L27】
 
-## 调研结果（基于本地 README/文档）
+**使用方式**
+- npm 安装或下载二进制运行；也支持从源码构建（二进制打包）。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L52-L94】
 
-> 说明：以下内容来自本地仓库文档，重点区分“模型能力（模型/供应商/推理能力）”与“工具能力（运行、集成、自动化/外部工具等）”。
+**配置与扩展**
+- 支持 `AGENTS.md/CLAUDE.md` 项目上下文说明、`SYSTEM.md`/`APPEND_SYSTEM.md` 系统提示词覆盖或追加机制。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L598-L651】
+- 支持 `~/.pi/agent/settings.json` 与 `<cwd>/.pi/settings.json` 进行全局/项目级配置合并，可配置默认模型、compaction、扩展等。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L773-L858】
 
-### Claude Code
+**集成方式（自部署/三方 API）**
+- 通过 `~/.pi/agent/models.json` 自定义 provider，可接入 Ollama、vLLM、LM Studio 等本地/自部署模型，并支持自定义 baseUrl 与 headers；内置支持 OpenAI/Anthropic/Google 等 API 规范（openai-responses、anthropic-messages 等）。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L654-L742】
+- API key 支持 env、命令获取或明文配置，并可代理内置 provider 到自建网关。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L654-L742】
 
-- **模型能力**
-  - 仓库 README 未直接给出可选模型或自定义提供方配置入口（需依赖官方文档）。【F:coding_agent/repos/claude-code/README.md†L1-L41】
-- **工具能力 / 集成**
-  - 插件系统支持自定义命令、代理、Hooks 与 MCP 服务器，扩展能力由插件提供。【F:coding_agent/repos/claude-code/plugins/README.md†L1-L33】
-  - 插件结构支持 commands/agents/skills/hooks 与 `.mcp.json` 外部工具配置，便于团队扩展与共享。【F:coding_agent/repos/claude-code/plugins/README.md†L83-L100】
+**优势/不足（基于公开说明）**
+- 优势：对自部署模型与多供应商兼容性强，模型/配置可热更新，适合企业内网场景。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L654-L742】
+- 不足：需要维护本地模型与 provider 配置，对运维/配置要求更高。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L654-L858】
 
-### Codex CLI
+## 4) OpenCode（已归档）
 
-- **模型能力**
-  - CLI 支持多提供方与模型选择：可通过 `--provider` 指定 OpenAI、OpenRouter、Azure、Gemini、Ollama、Mistral、DeepSeek、xAI、Groq 等兼容 OpenAI API 的提供方，并通过环境变量设置各提供方 API key/base URL。【F:coding_agent/repos/codex/codex-cli/README.md†L64-L122】
-  - 默认模型为 `o4-mini`，可通过 `--model` 或配置覆盖；支持 OpenAI Responses API 可用模型。【F:coding_agent/repos/codex/codex-cli/README.md†L497-L499】
-- **工具能力 / 集成**
-  - CLI 提供审批模式与沙箱执行：Suggest/Auto Edit/Full Auto 不同权限，并在 Full Auto 中网络禁用与工作目录隔离。【F:coding_agent/repos/codex/codex-cli/README.md†L166-L199】
-  - 支持在 `~/.codex/config.toml` 配置 MCP 服务器以接入外部工具。【F:coding_agent/repos/codex/docs/config.md†L9-L15】
+**定位/设计思路**
+- OpenCode 是 Go 实现的终端 TUI AI 助手，具备多模型供应商、会话管理、工具执行与 LSP 等能力。【F:coding_agent/repos/opencode/README.md†L15-L44】
+- **注意**：项目已归档并迁移到 Crush（Charm 团队），后续建议关注新仓库。【F:coding_agent/repos/opencode/README.md†L1-L7】
 
-### Pi Mono (coding-agent)
+**使用方式**
+- 支持脚本安装、Homebrew/AUR/Go install 等方式安装 CLI。【F:coding_agent/repos/opencode/README.md†L46-L77】
 
-- **模型能力**
-  - 支持自定义提供方与模型注册：通过 `~/.pi/agent/models.json` 配置本地模型/代理（如 Ollama、vLLM、LM Studio）与多 API 协议，并支持自定义 headers、代理与鉴权策略。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L654-L739】
-- **工具能力 / 集成**
-  - 内置 `read/write/edit/bash` 等默认工具，支持 `--tools` 启用只读工具（grep/find/ls）用于安全审查场景。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L1314-L1335】
-  - 提供 SDK 与 RPC 模式用于嵌入业务系统或跨语言集成，支持自定义工具、扩展与技能发现等能力。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L1343-L1383】
-  - 设计上明确“不使用 MCP/子代理”，强调可观测性与自行扩展工具的路径。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L1405-L1424】
+**配置与扩展**
+- 配置文件路径：`$HOME/.opencode.json`、`$XDG_CONFIG_HOME/opencode/.opencode.json` 或本地 `./.opencode.json`。【F:coding_agent/repos/opencode/README.md†L79-L85】
+- 支持自动压缩上下文（autoCompact）、配置 shell 路径与参数，以及 MCP 服务器配置。【F:coding_agent/repos/opencode/README.md†L87-L162】
 
-### OpenCode
+**集成方式（自部署/三方 API）**
+- 支持 OpenAI、Anthropic、Gemini、Bedrock、Groq、Azure OpenAI、OpenRouter 等 API，通过环境变量与 config 配置；并提供 `LOCAL_ENDPOINT` 用于自部署模型接入。【F:coding_agent/repos/opencode/README.md†L31-L126】
 
-- **模型能力**
-  - 支持多提供方（OpenAI、Anthropic、Gemini、Bedrock、Groq、Azure、OpenRouter），并支持本地模型（`LOCAL_ENDPOINT`）。【F:coding_agent/repos/opencode/README.md†L30-L33】【F:coding_agent/repos/opencode/README.md†L92-L116】
-  - 配置文件允许对不同 agent 指定模型与 token 上限（如 coder/task/title）。【F:coding_agent/repos/opencode/README.md†L137-L155】
-- **工具能力 / 集成**
-  - 具备命令执行/文件搜索/修改等工具能力，并提供 LSP 集成、会话管理与 SQLite 存储等工程化能力。【F:coding_agent/repos/opencode/README.md†L34-L43】
-  - 配置支持 MCP 服务器接入外部工具与上下文。【F:coding_agent/repos/opencode/README.md†L161-L168】
-  - 仓库已归档并迁移到新项目 Crush，后续调研可转向该项目以跟踪最新实现。【F:coding_agent/repos/opencode/README.md†L1-L8】
+**优势/不足（基于公开说明）**
+- 优势：多供应商支持面广、配置项齐全，具备 LSP 与工具执行等开发者友好功能。【F:coding_agent/repos/opencode/README.md†L31-L162】
+- 不足：仓库已归档，后续维护需迁移到 Crush 生态，稳定性与更新节奏需重新评估。【F:coding_agent/repos/opencode/README.md†L1-L7】
 
-### Kimi CLI
+## 5) Kimi CLI
 
-- **模型能力**
-  - 仓库 README 未明确列出可选模型与自定义模型配置方式（需依赖官方文档）。【F:coding_agent/repos/kimi-cli/README.md†L1-L24】
-- **工具能力 / 集成**
-  - CLI 具备读/写/执行命令与抓取网页等能力，并可自动规划与调整行动；适合通用文本处理的“工具调用型”场景。【F:coding_agent/repos/kimi-cli/README.md†L8-L12】
-  - 支持 ACP 协议进行 IDE/编辑器集成（Zed/JetBrains 等），并提供 MCP 服务器管理与 ad-hoc 配置。【F:coding_agent/repos/kimi-cli/README.md†L32-L83】【F:coding_agent/repos/kimi-cli/README.md†L88-L136】
+**定位/设计思路**
+- 终端 AI agent，支持代码读写、命令执行、网页搜索与任务规划，处于技术预览阶段。【F:coding_agent/repos/kimi-cli/README.md†L1-L18】
 
-## 建议的对比维度（后续补齐）
+**使用方式**
+- 通过官方文档完成安装与启动（README 指向 Getting Started 文档）。【F:coding_agent/repos/kimi-cli/README.md†L18-L22】
 
-1. **功能面**：代码生成、重构、测试、搜索、文档
-2. **扩展性**：工具接口、插件、SDK
-3. **集成能力**：自部署模型、三方 API、企业网关
-4. **安全与治理**：审计、权限、隔离、数据出境
-5. **使用体验**：指令范式、上下文保持、故障恢复
+**配置与扩展**
+- 支持 ACP（Agent Client Protocol），可在 Zed/JetBrains 等 IDE 中作为 ACP agent server 集成；配置示例为 `~/.config/zed/settings.json` 或 `~/.jetbrains/acp.json`。【F:coding_agent/repos/kimi-cli/README.md†L34-L66】
+- 内置 MCP 支持，提供 `kimi mcp` 管理子命令；支持 ad-hoc MCP 配置文件并通过 `--mcp-config-file` 传入。【F:coding_agent/repos/kimi-cli/README.md†L76-L123】
 
-## 通用文本处理能力（待源码验证）
+**集成方式（自部署/三方 API）**
+- README 未直接给出模型接入与 API key 配置，需在官方文档中进一步确认具体认证与企业集成方式。【F:coding_agent/repos/kimi-cli/README.md†L1-L123】
 
-> 针对“coding agent 是否可泛化为通用文本处理工具”的补充调研维度。
+**优势/不足（基于公开说明）**
+- 优势：ACP 与 MCP 让 IDE 与外部工具集成路径清晰，适合企业协作链路打通。【F:coding_agent/repos/kimi-cli/README.md†L34-L123】
+- 不足：处于技术预览阶段，功能与稳定性仍需评估。【F:coding_agent/repos/kimi-cli/README.md†L13-L18】
 
-### 基础能力（通用文本任务）
+## 横向对比（摘要）
 
-- **文本生成与改写**：摘要、润色、翻译、格式转换、模板填充
-- **信息抽取与结构化**：实体识别、字段抽取、要点归纳、表格化输出
-- **文本对齐与比对**：差异对比、版本合并、变更说明生成
-- **知识问答与检索结合**：RAG 适配、引用与溯源、长文档阅读
-- **批处理与自动化**：批量文档处理、规则化输出校验
+| 维度 | Claude Code | Codex | Pi Mono | OpenCode | Kimi CLI |
+| --- | --- | --- | --- | --- | --- |
+| 交互形态 | CLI/IDE/GitHub | CLI/IDE/Web | CLI | CLI/TUI | CLI/ACP/IDE |
+| 插件/工具扩展 | 插件+MCP | MCP | skills/扩展 + 自定义 provider | MCP + LSP | MCP + ACP |
+| 自部署模型 | 文档待确认 | 文档待确认 | 支持（Ollama/vLLM/LM Studio 等） | 支持（LOCAL_ENDPOINT） | 文档待确认 |
+| 多供应商 API | 文档待确认 | OpenAI 为主 | OpenAI/Anthropic/Google 等 | OpenAI/Anthropic/Gemini/Bedrock/Groq/OpenRouter 等 | 文档待确认 |
+| 维护状态 | 活跃 | 活跃 | 活跃 | 已归档，迁移到 Crush | 技术预览 |
 
-> **区分提示**：上述“基础能力”主要取决于模型本身（推理、语言覆盖、长上下文），而“批处理/自动化/检索联动”等能力往往依赖工具链与集成方式（文件/命令/搜索/MCP/SDK）。【F:coding_agent/repos/pi-mono/packages/coding-agent/README.md†L1314-L1383】【F:coding_agent/repos/codex/codex-cli/README.md†L166-L199】
+> 说明：表格中“文档待确认”代表仓库内 README 未给出明确信息，需进一步查阅官方文档或使用实测补齐。
 
-### 嵌入到定制化场景/环境的能力
+## 后续建议
 
-- **工具与插件框架**：是否支持自定义工具、调用企业内部 API
-- **权限与隔离**：细粒度权限控制、执行范围限制、敏感数据处理
-- **上下文管理**：多文档、长会话、项目级记忆与压缩策略
-- **可编排性**：工作流/链式调用、任务队列、并发执行
-- **可观测性与治理**：审计日志、指标、失败重试与回滚
-- **可移植性**：部署到本地/私有云/容器化环境的难易度
-
-### 建议输出形式（补齐时）
-
-1. **对比表**：每个工具在“基础能力/嵌入能力”上的支持度与方式
-2. **场景案例**：如客服 FAQ 归档、合同/需求文档结构化、研发周报自动化
-3. **集成清单**：需要的 API Key、代理网关、模型部署方式
-
-## 下一步行动
-
-1. 继续深入阅读各 repo 的 docs/示例配置并补齐对比表
-2. 结合公司场景输出“使用方式 + 配置方法 + 典型场景”的落地建议
-3. 汇总优势/劣势与推荐落地路径
+1. **补齐各项目官方文档细节**：尤其是 Claude Code、Codex、Kimi CLI 的认证与企业集成策略。
+2. **基于真实项目实测**：统一任务集（新增功能、修复 bug、重构、编写测试）对比完成时间、失败率与可控性。
+3. **企业落地评估**：重点评估权限控制、审计、数据出境、安全策略与自部署模型能力。
